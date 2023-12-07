@@ -1,9 +1,24 @@
 package com.banana.bananawhatsapp.persistencia;
 
+import com.banana.bananawhatsapp.config.SpringConfig;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {SpringConfig.class})
 class UsuarioRepositoryTest {
-    IUsuarioRepository repo;
+    @Autowired
+    private IUsuarioRepository repo;
+
+    @Test
+    void testBeans() {
+        assertNotNull(repo);
+    }
 
     @Test
     void dadoUnUsuarioValido_cuandoCrear_entoncesUsuarioValido() {

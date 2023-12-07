@@ -1,6 +1,5 @@
 package com.banana.bananawhatsapp.persistencia;
 
-import com.banana.bananawhatsapp.modelos.Mensaje;
 import com.banana.bananawhatsapp.modelos.Usuario;
 
 import java.sql.SQLException;
@@ -14,5 +13,7 @@ public interface IUsuarioRepository {
     public boolean borrar(Usuario usuario) throws SQLException;
 
     public Set<Usuario> obtenerPosiblesDestinatarios(Integer id, Integer max) throws SQLException;
+
+    public Usuario buscar(Integer id) throws SQLException;
 
 }
