@@ -13,7 +13,7 @@ import java.util.Set;
 import java.sql.SQLException;
 
 @Setter
-@Service
+//@Service
 public class ServicioUsuarios implements IServicioUsuarios{
     @Autowired
     private IUsuarioRepository repoUsuario;
@@ -61,7 +61,7 @@ public class ServicioUsuarios implements IServicioUsuarios{
         Usuario usu = null;
         try {
             usuarios = repoUsuario.obtenerPosiblesDestinatarios(usuario.getId(), 20);
-            usuario = usuarios.iterator().next();
+            usu = usuarios.iterator().next();
         } catch (SQLException e) {
             throw new UsuarioException("Destinatarios no encontrados");
         }

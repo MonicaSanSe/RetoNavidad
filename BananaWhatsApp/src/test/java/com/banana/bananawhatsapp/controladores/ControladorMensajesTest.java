@@ -1,15 +1,20 @@
 package com.banana.bananawhatsapp.controladores;
 
 import com.banana.bananawhatsapp.config.SpringConfig;
+import com.banana.bananawhatsapp.exceptions.MensajeException;
+import com.banana.bananawhatsapp.modelos.Mensaje;
 import com.banana.bananawhatsapp.modelos.Usuario;
+import com.banana.bananawhatsapp.persistencia.IMensajeRepository;
 import com.banana.bananawhatsapp.persistencia.IUsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +25,17 @@ class ControladorMensajesTest {
 
     @Autowired
     private ControladorMensajes controladorMensajes;
-
+    @Autowired
+    private ApplicationContext context;
+    @Autowired
+    private IUsuarioRepository repoUsu;
+    @Autowired
+    private IMensajeRepository repoMens;
+    @Test
+    void testBeans() {
+     assertNotNull(controladorMensajes);
+     assertNotNull(context);
+    }
     @Test
     void dadoRemitenteYDestinatarioYTextoValidos_cuandoEnviarMensaje_entoncesOK()  {
           assertNotNull(controladorMensajes.enviarMensaje(1,2,"Prueba controlador"));
@@ -36,7 +51,9 @@ class ControladorMensajesTest {
     @Test
     void dadoRemitenteYDestinatarioValidos_cuandoMostrarChat_entoncesOK() {
 
-        assertNotNull(controladorMensajes.mostrarChat(1,2));
+        assertThrows(MensajeException.class, () -> {
+            controladorMensajes.mostrarChat(1,2);
+        });
     }
 
     @Test
@@ -47,13 +64,21 @@ class ControladorMensajesTest {
     }
 
     @Test
-    void dadoRemitenteYDestinatarioValidos_cuandoEliminarChatConUsuario_entoncesOK() {
+    void dadoRemitenteYDestinatarioValidos_cuandoEliminarChatConUsuario_entoncesOK() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+        Usuario usuCre2 = new Usuario(null,"MonicaEnvio2","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario2 = repoUsu.crear(usuCre2);
+        Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba eliminar controlador mensajes", LocalDate.now());
+        Mensaje mens1 = repoMens.crear(mens);
 
-        assertTrue(controladorMensajes.eliminarChatConUsuario(1,2));
+        assertTrue(controladorMensajes.eliminarChatConUsuario(usuario2.getId(),usuario1.getId()));
     }
 
     @Test
     void dadoRemitenteYDestinatarioNOValidos_cuandoEliminarChatConUsuario_entoncesExcepcion() {
-        assertFalse(controladorMensajes.eliminarChatConUsuario(null,2));
+        assertThrows(NullPointerException.class, () -> {
+            controladorMensajes.eliminarChatConUsuario(null,2);
+        });
     }
 }

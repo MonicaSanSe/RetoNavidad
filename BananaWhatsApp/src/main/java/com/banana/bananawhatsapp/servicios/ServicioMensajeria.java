@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Setter
-@Service
+//@Service
 public class ServicioMensajeria implements IServicioMensajeria {
     @Autowired
     private IMensajeRepository repoMensajes;
@@ -34,13 +34,13 @@ public class ServicioMensajeria implements IServicioMensajeria {
     }
 
     @Override
-    public List<Mensaje> mostrarChatConUsuario(Usuario remitente, Usuario destinatario) throws UsuarioException, MensajeException {
+    public List<Mensaje> mostrarChatConUsuario(Usuario remitente, Usuario destinatario) throws UsuarioException, MensajeException, SQLException {
         List<Mensaje> mensajes = null;
 
         try {
             mensajes = repoMensajes.obtener(remitente, destinatario);
         } catch (SQLException e) {
-            throw new MensajeException("no hay chats para listar");
+            throw new SQLException("no hay chats para listar");
         }
 
         return mensajes;

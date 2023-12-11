@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Setter
-@Repository
+//@Repository
 public class MensajeJDBCRepository implements IMensajeRepository{
-    @Value("${db_url}")
+    @Value("${db.conn}")
     private String connUrl;
 
     @Autowired
@@ -23,7 +23,7 @@ public class MensajeJDBCRepository implements IMensajeRepository{
 
     @Override
     public Mensaje crear(Mensaje mensaje) throws SQLException{
-         String sql = "INSERT INTO mensaje (`id`, `cuerpo`, `fecha`, `from_user`, `to_user`)  values (NULL,?,?,?,?,?)";
+         String sql = "INSERT INTO mensaje (`id`, `cuerpo`, `fecha`, `from_user`, `to_user`)  values (NULL,?,?,?,?)";
 
          Connection conn = DriverManager.getConnection(connUrl);
          PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -84,14 +84,15 @@ public class MensajeJDBCRepository implements IMensajeRepository{
                 Connection conn = DriverManager.getConnection(connUrl);
                 PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
-            stmt.setInt(1, remitente.getId());
-            stmt.setInt(2, destinatario.getId());
+            stmt.setInt(1, destinatario.getId());
+            stmt.setInt(2, remitente.getId());
 
             int rows = stmt.executeUpdate();
             System.out.println(rows);
 
             if (rows <= 0) {
-                throw new SQLException("No se han encontrado mensajes para borrar!!!");
+                System.out.println("No se han encontrado mensajes para borrar!!!");
+                return false;
             }
 
         } catch (SQLException e) {

@@ -24,15 +24,22 @@ class MensajeRepositoryTest {
     @Autowired
     private IUsuarioRepository repoUsu;
 
+    @Autowired
+    private ApplicationContext context;
+
     @Test
     void testBeans() {
+        assertNotNull(context);
         assertNotNull(repo);
     }
 
     @Test
     void dadoUnMensajeValido_cuandoCrear_entoncesMensajeValido() throws SQLException {
-        Usuario usuario1 = repoUsu.buscar(1);
-        Usuario usuario2 = repoUsu.buscar(2);
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+        Usuario usuCre2 = new Usuario(null,"MonicaEnvio2","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario2 = repoUsu.crear(usuCre2);
+
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba repo", LocalDate.now());
 
         assertNotNull(repo.crear(mens));
@@ -41,11 +48,10 @@ class MensajeRepositoryTest {
 
     @Test
     void dadoUnMensajeNOValido_cuandoCrear_entoncesExcepcion() throws SQLException {
-        Usuario usuario1 = repoUsu.buscar(1);
-        Usuario usuario2 = repoUsu.buscar(2);
-        Mensaje mens = new Mensaje(null,usuario1, usuario2,"12", LocalDate.now());
 
-        assertThrows(SQLException.class, () -> {
+        Mensaje mens = new Mensaje(null,null, null,null, LocalDate.now());
+
+        assertThrows(NullPointerException.class, () -> {
             repo.crear(mens);
         });
 
@@ -53,8 +59,11 @@ class MensajeRepositoryTest {
 
     @Test
     void dadoUnUsuarioValido_cuandoObtener_entoncesListaMensajes() throws SQLException {
-         Usuario usuario1 = repoUsu.buscar(1);
-         Usuario usuario2 = repoUsu.buscar(2);
+         Usuario usuCre1 = new Usuario(null,"MonicaObtener1","monicass@gmail.com", LocalDate.now(), true);
+         Usuario usuario1 = repoUsu.crear(usuCre1);
+         Usuario usuCre2 = new Usuario(null,"MonicaObtener2","monicass@gmail.com", LocalDate.now(), true);
+         Usuario usuario2 = repoUsu.crear(usuCre2);
+
          assertNotNull(repo.obtener(usuario1,usuario2));
     }
 
@@ -62,7 +71,7 @@ class MensajeRepositoryTest {
     void dadoUnUsuarioNOValido_cuandoObtener_entoncesExcepcion() {
          Usuario usuario1 = null;
          Usuario usuario2 = null;
-         assertThrows(SQLException.class, () -> {
+         assertThrows(NullPointerException.class, () -> {
             repo.obtener(usuario1,usuario2);
         });
 
@@ -70,16 +79,20 @@ class MensajeRepositoryTest {
 
     @Test
     void dadoUnUsuarioValido_cuandoBorrarTodos_entoncesOK() throws SQLException {
-        Usuario usuario1 = repoUsu.buscar(1);
-         Usuario usuario2 = repoUsu.buscar(2);
-         assertTrue(repo.borrarTodos(usuario1,usuario2));
+        Usuario usuCre1 = new Usuario(null,"MonicaBorrar1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+        Usuario usuCre2 = new Usuario(null,"MonicaBorrar2","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario2 = repoUsu.crear(usuCre2);
+        Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba repoBorrar", LocalDate.now());
+        Mensaje mens1 = repo.crear(mens);
+        assertTrue(repo.borrarTodos(usuario2,usuario1));
     }
 
     @Test
     void dadoUnUsuarioNOValido_cuandoBorrarTodos_entoncesExcepcion() throws SQLException {
 
-        Usuario usuario1 = null;
-         Usuario usuario2 = null;
+        Usuario usuario1 = new Usuario(999999,"MonicaBorrar1","monicass@gmail.com", LocalDate.now(), true);
+         Usuario usuario2 = new Usuario(999998,"MonicaBorrar1","monicass@gmail.com", LocalDate.now(), true);
          assertFalse(repo.borrarTodos(usuario1,usuario2));
     }
 

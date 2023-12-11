@@ -1,5 +1,6 @@
 package com.banana.bananawhatsapp.controladores;
 
+import com.banana.bananawhatsapp.exceptions.MensajeException;
 import com.banana.bananawhatsapp.modelos.Mensaje;
 import com.banana.bananawhatsapp.modelos.Usuario;
 import com.banana.bananawhatsapp.servicios.IServicioMensajeria;
@@ -50,7 +51,7 @@ public class ControladorMensajes {
             return true;
         } catch (Exception e) {
             System.out.println("Ha habido un error: " + e.getMessage());
-            throw e;
+            throw new MensajeException("Ha habido un error: " + e.getMessage());
         }
 
     }

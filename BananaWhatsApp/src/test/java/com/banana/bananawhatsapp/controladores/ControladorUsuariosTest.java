@@ -5,6 +5,7 @@ import com.banana.bananawhatsapp.modelos.Usuario;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -18,7 +19,14 @@ class ControladorUsuariosTest {
 
     @Autowired
     private ControladorUsuarios controladorUsuarios;
+    @Autowired
+    private ApplicationContext context;
 
+    @Test
+    void testBeans() {
+     assertNotNull(controladorUsuarios);
+     assertNotNull(context);
+    }
     @Test
     void dadoUsuarioValido_cuandoAlta_entoncesUsuarioValido() {
         Usuario usu = new Usuario(null, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
@@ -36,8 +44,10 @@ class ControladorUsuariosTest {
 
     @Test
     void dadoUsuarioValido_cuandoActualizar_entoncesUsuarioValido() {
-        Usuario usu = new Usuario(2, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
-        assertNotNull(controladorUsuarios.actualizar(usu));
+        Usuario usuCre = new Usuario(2, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
+        Usuario usu = controladorUsuarios.alta(usuCre);
+        Usuario usuAct = new Usuario(usu.getId(), "Monica22", "monicass22@gmail.com", LocalDate.now(),true);
+        assertNotNull(controladorUsuarios.actualizar(usuAct));
     }
 
     @Test

@@ -1,9 +1,9 @@
 package com.banana.bananawhatsapp.persistencia;
 
+import com.banana.bananawhatsapp.exceptions.UsuarioException;
 import com.banana.bananawhatsapp.modelos.Usuario;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -11,9 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Setter
-@Repository
+//@Repository
 public class UsuarioJDBCRepository implements IUsuarioRepository{
-    @Value("${db_url}")
+    @Value("${db.conn}")
     private String connUrl;
 
 
@@ -48,20 +48,26 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
 
     @Override
     public Usuario actualizar(Usuario usuario) throws SQLException {
-        String sql = "UPDATE usuario set email=?, nombre=? WHERE id=?";
+        String sql = "UPDATE usuario set email=?, nombre=? WHERE id=? and activo=?";
+        int rows = 0;
 
         try (
                 Connection conn = DriverManager.getConnection(connUrl);
                 PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
-            stmt.setString(1, usuario.getNombre());
-            stmt.setString(2, usuario.getEmail());
+            stmt.setString(1, usuario.getEmail());
+            stmt.setString(2, usuario.getNombre());
             stmt.setInt(3, usuario.getId());
+            stmt.setBoolean(4, true);
 
-            int rows = stmt.executeUpdate();
+            rows = stmt.executeUpdate();
 
         } catch (SQLException e) {
              throw new SQLException("Usuario no actualizado!!");
+        }
+
+        if(rows == 0){
+                throw new UsuarioException("Usuario no actualizado!!");
         }
 
         return usuario;
@@ -69,19 +75,23 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
 
     @Override
     public boolean borrar(Usuario usuario) throws SQLException {
-        String sql = "DELETE FROM usuario WHERE id=?";
+      //  String sql = "DELETE FROM usuario WHERE id=?";
+        String sql = "UPDATE usuario set activo=? WHERE id=?";
 
         try (
                 Connection conn = DriverManager.getConnection(connUrl);
                 PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
-            stmt.setInt(1, usuario.getId());
+            //stmt.setInt(1, usuario.getId());
+            stmt.setBoolean(1, false);
+            stmt.setInt(2, usuario.getId());
 
             int rows = stmt.executeUpdate();
             System.out.println(rows);
 
             if (rows <= 0) {
-                throw new SQLException("Usuario no borrado, no encontrado!!");
+                System.out.println("Usuario no borrado, no encontrado!!");
+                return false;
             }
 
         } catch (SQLException e) {
@@ -95,8 +105,8 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
     @Override
     public Set<Usuario> obtenerPosiblesDestinatarios(Integer id, Integer max) throws SQLException {
         Set<Usuario> usuarios = new HashSet<>();
-
-        String sql = "SELECT * FROM usuario where id!=?";
+        int cont = 0;
+        String sql = "SELECT * FROM usuario where id!=? and activo=?";
 
         try (
                 Connection conn = DriverManager.getConnection(connUrl);
@@ -105,13 +115,18 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
 
         ) {
             pstm.setInt(1, id);
+            pstm.setBoolean(2,true);
+
             ResultSet rs = pstm.executeQuery();
-            int cont = 0;
             while (rs.next() && cont <= max) {
                 LocalDate alta = rs.getDate("alta").toLocalDate();
                 usuarios.add(new Usuario(rs.getInt("id"),rs.getString("nombre"), rs.getString("email"), alta, rs.getBoolean("activo")));
                 cont++;
             }
+
+        }
+        if(cont==0){
+                throw new SQLException("Posibles destinatarios no encontrados!!");
         }
 
         return usuarios;
@@ -119,7 +134,7 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
     @Override
     public Usuario buscar(Integer id) throws SQLException {
         Usuario usu = null;
-        String sql = "SELECT u.* FROM usuario u WHERE id=?";
+        String sql = "SELECT u.* FROM usuario u WHERE id=? and activo=?";
 
         try (
                 Connection conn = DriverManager.getConnection(connUrl);
@@ -128,6 +143,7 @@ public class UsuarioJDBCRepository implements IUsuarioRepository{
 
         ) {
             pstm.setInt(1, id);
+            pstm.setBoolean(2, true);
             ResultSet rs = pstm.executeQuery();
             if (rs.next()) {
                 LocalDate alta = LocalDate.parse(rs.getString("alta"));
