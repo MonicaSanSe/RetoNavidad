@@ -84,8 +84,8 @@ public class MensajeJDBCRepository implements IMensajeRepository{
                 Connection conn = DriverManager.getConnection(connUrl);
                 PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
-            stmt.setInt(1, destinatario.getId());
-            stmt.setInt(2, remitente.getId());
+            stmt.setInt(1, remitente.getId());
+            stmt.setInt(2, destinatario.getId());
 
             int rows = stmt.executeUpdate();
             System.out.println(rows);

@@ -13,7 +13,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -38,7 +41,10 @@ class ServicioUsuariosTest {
     @Test
     void dadoUnUsuarioValido_cuandoCrearUsuario_entoncesUsuarioValido() {
         Usuario usu = new Usuario(null,"Monica","monicass@gmail.com", LocalDate.now(), true);
-        assertNotNull(servicio.crearUsuario(usu));
+        Usuario nuevo = servicio.crearUsuario(usu);
+        assertNotNull(nuevo);
+        assertThat(nuevo.getId(), greaterThan(0));
+        assertEquals(nuevo.getNombre(),"Monica");
     }
 
     @Test
@@ -69,8 +75,12 @@ class ServicioUsuariosTest {
         Usuario usu = servicio.crearUsuario(usuCre);
 
         Usuario usuAct = new Usuario(usu.getId(),"MonicaServ1","monicass@gmail.com", LocalDate.now(), true);
-        assertNotNull(servicio.actualizarUsuario(usuAct));
-
+        Usuario actualizado = servicio.actualizarUsuario(usuAct);
+        assertNotNull(actualizado);
+        assertThat(actualizado.getId(), greaterThan(0));
+        assertEquals(actualizado.getId(),usuAct.getId());
+        assertEquals(actualizado.getNombre(),"MonicaServ1");
+        assertNotEquals(actualizado.getNombre(),usu.getNombre());
     }
 
     @Test
@@ -86,7 +96,10 @@ class ServicioUsuariosTest {
     void dadoUnUsuarioValido_cuandoObtenerPosiblesDesinatarios_entoncesUsuarioValido() throws SQLException {
         Usuario usuCrea = new Usuario(null,"Monica","monicass@gmail.com", LocalDate.now(), true);
         Usuario usu = servicio.crearUsuario(usuCrea);
-        assertNotNull(servicio.obtenerPosiblesDesinatarios(usu,20));
+
+        Set<Usuario> dest = servicio.obtenerPosiblesDesinatarios(usu,20);
+        assertNotNull(dest);
+        assertThat(dest.iterator().next().getId(), greaterThan(0));
     }
 
     @Test

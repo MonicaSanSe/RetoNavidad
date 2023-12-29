@@ -15,7 +15,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -47,7 +50,10 @@ class ServicioMensajeriaTest {
         Usuario usuCre2 = new Usuario(null,"MonicaBorrar2","monicass@gmail.com", LocalDate.now(), true);
         Usuario usuario2 = repoUsu.crear(usuCre2);
 
-        assertNotNull(servicio.enviarMensaje(usuario1, usuario2,"mensaje de prueba" ));
+        Mensaje mens = servicio.enviarMensaje(usuario1, usuario2,"mensaje de prueba" );
+        assertNotNull(mens);
+        assertThat(mens.getId(), greaterThan(0));
+        assertEquals(mens.getCuerpo(),"mensaje de prueba");
     }
 
     @Test
@@ -72,7 +78,11 @@ class ServicioMensajeriaTest {
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba repoBorrar", LocalDate.now());
         Mensaje mens1 = repoMen.crear(mens);
 
-        assertNotNull(servicio.mostrarChatConUsuario(usuario2, usuario1));
+        List<Mensaje> listMens = servicio.mostrarChatConUsuario(usuario1, usuario2);
+        assertNotNull(listMens);
+        assertThat(listMens.get(0).getId(), greaterThan(0));
+        assertEquals(listMens.get(0).getCuerpo(),"mensaje prueba repoBorrar");
+
     }
 
     @Test
@@ -94,7 +104,7 @@ class ServicioMensajeriaTest {
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba servi mensaje borrar", LocalDate.now());
         Mensaje mens1 = repoMen.crear(mens);
 
-        assertTrue(servicio.borrarChatConUsuario(usuario2, usuario1));
+        assertTrue(servicio.borrarChatConUsuario(usuario1, usuario2));
     }
 
     @Test

@@ -56,16 +56,14 @@ public class ServicioUsuarios implements IServicioUsuarios{
     }
 
     @Override
-    public Usuario obtenerPosiblesDesinatarios(Usuario usuario, int max) throws UsuarioException {
+    public Set<Usuario> obtenerPosiblesDesinatarios(Usuario usuario, int max) throws UsuarioException {
         Set<Usuario> usuarios = new HashSet<>();
-        Usuario usu = null;
         try {
             usuarios = repoUsuario.obtenerPosiblesDestinatarios(usuario.getId(), 20);
-            usu = usuarios.iterator().next();
         } catch (SQLException e) {
             throw new UsuarioException("Destinatarios no encontrados");
         }
 
-        return usu;
+        return usuarios;
     }
 }

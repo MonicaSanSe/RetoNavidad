@@ -12,7 +12,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -43,7 +46,8 @@ class MensajeRepositoryTest {
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba repo", LocalDate.now());
 
         assertNotNull(repo.crear(mens));
-
+        assertThat(mens.getId(), greaterThan(0));
+        assertEquals(mens.getCuerpo(),"mensaje prueba repo");
     }
 
     @Test
@@ -63,8 +67,15 @@ class MensajeRepositoryTest {
          Usuario usuario1 = repoUsu.crear(usuCre1);
          Usuario usuCre2 = new Usuario(null,"MonicaObtener2","monicass@gmail.com", LocalDate.now(), true);
          Usuario usuario2 = repoUsu.crear(usuCre2);
+         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje lalala", LocalDate.now());
+         Mensaje enviado = repo.crear(mens);
 
-         assertNotNull(repo.obtener(usuario1,usuario2));
+         List<Mensaje> listMens = repo.obtener(usuario1,usuario2);
+
+         assertNotNull(listMens);
+         assertThat(listMens.get(0).getId(), greaterThan(0));
+         assertEquals(listMens.size(), 1);
+         assertEquals(listMens.get(0).getCuerpo(),"mensaje lalala");
     }
 
     @Test
@@ -85,7 +96,7 @@ class MensajeRepositoryTest {
         Usuario usuario2 = repoUsu.crear(usuCre2);
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba repoBorrar", LocalDate.now());
         Mensaje mens1 = repo.crear(mens);
-        assertTrue(repo.borrarTodos(usuario2,usuario1));
+        assertTrue(repo.borrarTodos(usuario1,usuario2));
     }
 
     @Test

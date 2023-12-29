@@ -11,6 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -30,7 +32,10 @@ class ControladorUsuariosTest {
     @Test
     void dadoUsuarioValido_cuandoAlta_entoncesUsuarioValido() {
         Usuario usu = new Usuario(null, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
-        assertNotNull(controladorUsuarios.alta(usu));
+        Usuario nuevo = controladorUsuarios.alta(usu);
+        assertNotNull(nuevo);
+        assertThat(nuevo.getId(), greaterThan(0));
+        assertEquals(nuevo.getNombre(),"Monica2");
     }
 
     @Test
@@ -44,10 +49,14 @@ class ControladorUsuariosTest {
 
     @Test
     void dadoUsuarioValido_cuandoActualizar_entoncesUsuarioValido() {
-        Usuario usuCre = new Usuario(2, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
+        Usuario usuCre = new Usuario(null, "Monica2", "monicass2@gmail.com", LocalDate.now(),true);
         Usuario usu = controladorUsuarios.alta(usuCre);
         Usuario usuAct = new Usuario(usu.getId(), "Monica22", "monicass22@gmail.com", LocalDate.now(),true);
-        assertNotNull(controladorUsuarios.actualizar(usuAct));
+        Usuario actualizado = controladorUsuarios.actualizar(usuAct);
+        assertNotNull(actualizado);
+         assertThat(actualizado.getId(), greaterThan(0));
+        assertEquals(actualizado.getNombre(),"Monica22");
+         assertNotEquals(actualizado.getNombre(),usu.getNombre());
     }
 
     @Test

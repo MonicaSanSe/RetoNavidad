@@ -16,6 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -37,29 +39,45 @@ class ControladorMensajesTest {
      assertNotNull(context);
     }
     @Test
-    void dadoRemitenteYDestinatarioYTextoValidos_cuandoEnviarMensaje_entoncesOK()  {
-          assertNotNull(controladorMensajes.enviarMensaje(1,2,"Prueba controlador"));
+    void dadoRemitenteYDestinatarioYTextoValidos_cuandoEnviarMensaje_entoncesOK() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+        Usuario usuCre2 = new Usuario(null,"MonicaEnvio2","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario2 = repoUsu.crear(usuCre2);
+
+        assertTrue(controladorMensajes.enviarMensaje(usuario1.getId(),usuario2.getId(),"Prueba controlador"));
+
     }
 
     @Test
-    void dadoRemitenteYDestinatarioYTextoNOValidos_cuandoEnviarMensaje_entoncesExcepcion() {
-         assertThrows(Exception.class, () -> {
-            controladorMensajes.enviarMensaje(1,2,"hola" );
-        });
-    }
+    void dadoRemitenteYDestinatarioYTextoNOValidos_cuandoEnviarMensaje_entoncesExcepcion() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
 
-    @Test
-    void dadoRemitenteYDestinatarioValidos_cuandoMostrarChat_entoncesOK() {
-
-        assertThrows(MensajeException.class, () -> {
-            controladorMensajes.mostrarChat(1,2);
-        });
-    }
-
-    @Test
-    void dadoRemitenteYDestinatarioNOValidos_cuandoMostrarChat_entoncesExcepcion() {
         assertThrows(Exception.class, () -> {
-            controladorMensajes.mostrarChat(1,null );
+            controladorMensajes.enviarMensaje(usuario1.getId(),null,"hola" );
+        });
+    }
+
+    @Test
+    void dadoRemitenteYDestinatarioValidos_cuandoMostrarChat_entoncesOK() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+        Usuario usuCre2 = new Usuario(null,"MonicaEnvio2","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario2 = repoUsu.crear(usuCre2);
+        Boolean mens = controladorMensajes.enviarMensaje(usuario1.getId(),usuario2.getId(),"Prueba controlador");
+
+        assertTrue(controladorMensajes.mostrarChat(usuario1.getId(),usuario2.getId()));
+
+    }
+
+    @Test
+    void dadoRemitenteYDestinatarioNOValidos_cuandoMostrarChat_entoncesExcepcion() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+
+        assertThrows(Exception.class, () -> {
+            controladorMensajes.mostrarChat(usuario1.getId(),null );
         });
     }
 
@@ -72,13 +90,16 @@ class ControladorMensajesTest {
         Mensaje mens = new Mensaje(null,usuario1, usuario2,"mensaje prueba eliminar controlador mensajes", LocalDate.now());
         Mensaje mens1 = repoMens.crear(mens);
 
-        assertTrue(controladorMensajes.eliminarChatConUsuario(usuario2.getId(),usuario1.getId()));
+        assertTrue(controladorMensajes.eliminarChatConUsuario(usuario1.getId(),usuario2.getId()));
     }
 
     @Test
-    void dadoRemitenteYDestinatarioNOValidos_cuandoEliminarChatConUsuario_entoncesExcepcion() {
+    void dadoRemitenteYDestinatarioNOValidos_cuandoEliminarChatConUsuario_entoncesExcepcion() throws SQLException {
+        Usuario usuCre1 = new Usuario(null,"MonicaEnvio1","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usuario1 = repoUsu.crear(usuCre1);
+
         assertThrows(NullPointerException.class, () -> {
-            controladorMensajes.eliminarChatConUsuario(null,2);
+            controladorMensajes.eliminarChatConUsuario(usuario1.getId(),null);
         });
     }
 }

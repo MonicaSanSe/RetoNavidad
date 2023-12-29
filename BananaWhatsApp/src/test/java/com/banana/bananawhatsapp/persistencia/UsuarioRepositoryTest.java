@@ -12,7 +12,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -33,6 +36,8 @@ class UsuarioRepositoryTest {
     void dadoUnUsuarioValido_cuandoCrear_entoncesUsuarioValido() throws SQLException {
         Usuario usu = new Usuario(null,"Monica","monicass@gmail.com", LocalDate.now(), true);
         assertNotNull(repo.crear(usu));
+        assertThat(usu.getId(), greaterThan(0));
+        assertEquals(usu.getNombre(),"Monica");
     }
 
     @Test
@@ -49,7 +54,11 @@ class UsuarioRepositoryTest {
        Usuario usuCre = new Usuario(1,"MonicaSS","monicass@gmail.com", LocalDate.now(), true);
        Usuario usu = repo.crear(usuCre);
        Usuario usuAct = new Usuario(usu.getId(),"Monica","monicass@gmail.com", LocalDate.now(), true);
-        assertNotNull(repo.actualizar(usuAct));
+       Usuario actualizado = repo.actualizar(usuAct);
+        assertNotNull(actualizado);
+        assertThat(actualizado.getId(), greaterThan(0));
+        assertEquals(actualizado.getNombre(),"Monica");
+        assertNotEquals(actualizado.getNombre(),usu.getNombre());
     }
 
     @Test
@@ -78,7 +87,12 @@ class UsuarioRepositoryTest {
 
     @Test
     void dadoUnUsuarioValido_cuandoObtenerPosiblesDestinatarios_entoncesLista() throws SQLException {
-        assertNotNull(repo.obtenerPosiblesDestinatarios(1,20));
+        Usuario usuCrea = new Usuario(null,"Monica","monicass@gmail.com", LocalDate.now(), true);
+        Usuario usu = repo.crear(usuCrea);
+
+        Set<Usuario> dest = repo.obtenerPosiblesDestinatarios(usu.getId(),20);
+        assertNotNull(dest);
+        assertThat(dest.iterator().next().getId(), greaterThan(0));
     }
 
     @Test
