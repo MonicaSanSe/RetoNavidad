@@ -9,6 +9,7 @@ import com.banana.bananawhatsapp.servicios.ServicioUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class ServicesConfig {
@@ -19,6 +20,7 @@ public class ServicesConfig {
     IUsuarioRepository usuarioRepo;
 
     @Bean
+    @Profile("prod")
     public IServicioMensajeria getServicioMensajeria() {
         ServicioMensajeria mens = new ServicioMensajeria();
         mens.setRepoMensajes(mensajeRepo);
@@ -26,7 +28,24 @@ public class ServicesConfig {
     }
 
     @Bean
+    @Profile("prod")
     public IServicioUsuarios getServicioUsuarios() {
+        ServicioUsuarios usuRepo = new ServicioUsuarios();
+        usuRepo.setRepoUsuario(usuarioRepo);
+        return usuRepo;
+    }
+
+     @Bean
+     @Profile("dev")
+    public IServicioMensajeria getServicioMensajeriaDev() {
+        ServicioMensajeria mens = new ServicioMensajeria();
+        mens.setRepoMensajes(mensajeRepo);
+        return mens;
+    }
+
+    @Bean
+    @Profile("dev")
+    public IServicioUsuarios getServicioUsuariosDev() {
         ServicioUsuarios usuRepo = new ServicioUsuarios();
         usuRepo.setRepoUsuario(usuarioRepo);
         return usuRepo;
